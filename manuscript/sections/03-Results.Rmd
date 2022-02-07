@@ -1,0 +1,112 @@
+# Results
+
+## DRS-derived markers of perfusion
+
+Using the endoscopically-acquired spectroscopy data we longitudinally quantified values of perfusion in all groups. For fold changes in $\mbox{StO}_2$, the trend in the CG group showed no change across time, but an increase was observed in both the MET and MTD groups,  with maximums of 8% at week 4, and of 5% at week 3, respectively (Figure \@ref(fig:GAM-DRS-plot)A). For $\mbox{HbO}_2$, the CG group showed no trend over time, and the MET and MTD groups showed an increase in the fold change value with a maximum mean rise of 15% and 10% at weeks 4 and 3, respectively (Figure \@ref(fig:GAM-DRS-plot)B). Total hemoglobin (tHb) showed a similar trend in the three groups over time, where the mean increase reached a maximum of 13% and 11% in the MET and MTD groups at week 6 (Figure \@ref(fig:GAM-DRS-plot)C). The trends for HbO showed no change in the CG group, and an increase over the six-week period in both the MET and MTD groups (Figure \@ref(fig:GAM-DRS-plot)D) with mean maximum fold changes of 13% and 32%, respectively. 
+
+To determine if significant differences between the different groups existed, we performed pairwise comparisons to estimate the difference between the fitted smooths (via GAMs) for each DRS-derived perfusion value across the different groups. The rationale in this case is that when the difference between the fitted smooths is computed, a simultaneous confidence interval (s-CI) can be constructed around the difference, and the regions where the s-CI does not cover zero can be considered statistically significant periods of change. To improve visualization, we added a ribbon to highlight those periods where statistically significant differences existed. Significant differences existed in $\mbox{StO}_2$ between the CG-MET and CG-MTD pairs. Specifically, between weeks 2 and 5 the MET group showed an increase in oxygenation (Figure \@ref(fig:GAM-DRS-plot)E), whereas the increase was significant in the MTD group between weeks 2 and 4 (Figure \@ref(fig:GAM-DRS-plot)F). For $\mbox{HbO}_2$, the difference between the CG and MET groups was significant between weeks 3 and 4 (Figure \@ref(fig:GAM-DRS-plot)G). For tHb, a significant differences existed between the CG-MET and the MET-MTD groups between weeks 3 and 5 and at week 5, respectively (Figure \@ref(fig:GAM-DRS-plot)H, I).
+
+```{r,GAMs-DRS,  echo=FALSE, include=FALSE}
+source(here("code",
+                  "scripts",
+                  "DRS_GAMs.R"))
+```
+
+
+```{r,GAM-DRS-plot,fig.align='center', fig.width=10, fig.height=10,echo=FALSE, warning=FALSE, fig.cap='(ref:fig-DRS-caption)'}
+# a+b+c+d+o1+o2+o3+plot_annotation(tag_levels = "A")+plot_layout(byrow = F,design=layout)&
+#     theme(plot.tag = element_text(size=18,face='bold'),
+#           axis.title = element_text(size=14),
+#           axis.text = element_text(size=14))
+
+a+b+c+d+o1+o2+o3+o4+o5+plot_annotation(tag_levels = "A")+plot_layout(byrow = F,design=layout)&
+    theme(plot.tag = element_text(size=18,face='bold'),
+          axis.title = element_text(size=12),
+          axis.text = element_text(size=12),
+          strip.text=element_text(size=12))
+```
+
+(ref:fig-DRS-caption) GAMs and pairwise comparisons for DRS-derived fold change values of perfusion. **A**: Longitudinal changes in $\mbox{StO}_2$. The trend in the CG group remains flat while there is an increase that reaches a maximum at week 4 in the MET group and at week 3 in the MTD group. **B**: Longitudinal trends in $\mbox{HbO}_2$, there is little change in the CG group whereas the MET and MTD groups show an increase that reaches it maximum at week 4 (MET) and week 3 (MTD). **C**: Changes in tHb, there is an increase in tHb in the MET and MTD groups over time. **D**: Changes in HbO, there is no change in the CG group over time, the MET and MTD groups show a temporal increase in HbO. In panels A-D lines represent the smooth trend fitted to the data and shaded regions represent a 95% simultaneous confidence interval. Boxplots show data distribution, points represent outliers. **E**, **F**: Pairwise comparisons of the smooth trends in $\mbox{StO}_2$ shows a significant difference between the CG-MET and CG-MTD treated tumors between weeks 2 and 5 and 2 and 4, respectively.  **G**: Pairwise comparisons of the smooth trends in $\mbox{HbO}_2$ shows a significant difference between the CG and MET groups between weeks 3 and 5. **H**, **I**: There are significant differences in tHb between the CG and MET between weeks 3 and 4, and between the MET and MTD groups at week 5. In panels E-I the line represents the computed difference between the smooth trends in each group, shaded regions represent the 95% simultaneous confidence interval around the estimated difference, the purple area indicates time intervals of significance between the trends (where the confidence interval does not cover zero, which corresponds to the location of the red dotted line).
+
+## Gene Expression
+
+By obtaining repeated biopsies from tumors we were able to longitudinally examine the changes in expression in perfusion-related genes across the different treatment groups. Smooth trends (using GAMs) were obtained for each group in each case (Figure \@ref(fig:GAMs-qPCR-plot)). Although the expression of _Vegf_ showed a decrease over time in the CG and MET groups and an increase over time was observed in the MTD group, the MTD-treated tumors showed a 50% reduction in the expression of _Vegf_ at week 1. Over the course of the study, the expression of _Vegf_ in the MTD-treated group remained below the levels observed in the other groups (Figure \@ref(fig:GAMs-qPCR-plot)A). 
+
+For _Hif-1a_, a decrease in expression was observed in the CG group between weeks 1-4 followed by an increase between weeks 4-6; a increase between weeks 1-4 followed by a decrease between weeks 4-6 was observed in the MET group; and a 50% reduction at week 1 was observed in the MTD group, followed by an increase over the six-week period (Figure \@ref(fig:GAMs-qPCR-plot)B). 
+
+
+For _Dek_, an increase in the CG group between weeks 4-6 was observed, whereas the MET group showed a decrease over time. The MTD group showed a maximum increase at week 3, followed by a decrease between weeks 3-4 and an increase between weeks 4-6 (Figure \@ref(fig:GAMs-qPCR-plot)C). However, the range of variation in all groups was similar.
+
+Because HIF-1$\alpha$ is post-translationally regulated we also analyzed its downstream effects by analyzing the expression of _Aldoa_ and _Pgk1_ to indirectly assess its expression. For _Aldoa_, the expression over time showed an increase in the CG group, and a maximum was reached in the MET group at week 3; in the MTD group, there was no change in the trend over time and the range of the values was close to the expression of the gene at week 1 (Figure \@ref(fig:GAMs-qPCR-plot)D). 
+
+In the case of _Pgk1_, the same trends from _Aldoa_ were observed in the CG and MET groups, where the MTD group showed a reduction of $\approx$ 25% in expression at week 1 (\@ref(fig:GAMs-qPCR-plot)F). 
+
+In the case of _Stat3_, the trends in the three groups had a similar linear profile and showed minimal variation through the duration of the study (Figure \@ref(fig:GAMs-qPCR-plot)E). 
+
+Finally, for _Raptor_ a decrease in the expression between weeks 1-4 was observed in the CG group, followed by an increase between weeks 4-6. In the MET group, no change in the trend was observed, whereas a reduction of 50% was observed in the MTD group at week 1, followed by an increase through the duration of the study (Figure \@ref(fig:GAMs-qPCR-plot)G).
+
+
+```{r,GAMs-qPCR, echo=FALSE,include=FALSE}
+source(here("code",
+                  "scripts",
+                  "qPCR_GAMs.R"))
+```
+
+
+```{r,GAMs-qPCR-plot,fig.align='center', fig.width=10, fig.height=12,echo=FALSE, warning=FALSE,fig.cap='(ref:fig-qPCR-caption)'}
+a+b+c+d+e+f+g+plot_annotation(tag_levels = "A")+plot_layout(design = layout)&
+    theme(plot.tag = element_text(size=18,face='bold'),
+          axis.title = element_text(size=14),
+          axis.text = element_text(size=14),
+          strip.text=element_text(size=14))
+
+```
+
+
+(ref:fig-qPCR-caption) Longitudinal trends in the expression of different genes associated with perfusion in primary colorectal tumors. Boxplots present data distribution and points are outliers, lines represent the fitted smooth trend using the GAM. Shaded regions represent a 95% pointwise confidence interval around the smooth trend. **A**: Longitudinal trends in the expression of _Vegf_. **B**: Longitudinal changes in the expression of _Hif-1a_. **C**: Longitudinal changes in the expression of _Dek_. **D**: Longitudinal changes in the expression of _Aldoa_. **E**:Longitudinal changes in the expression of _Stat3_. **F**: Longitudinal changes in the expression of _Pgk1_. **G**: Longitudinal changes in the expression of _Raptor_.
+
+```{r,GAMs-qPCR-pwcomp, echo=FALSE,include=FALSE}
+source(here("code",
+                  "scripts",
+                  "qPCR_GAMs_pwcomps.R"))
+```
+
+Next, we performed pairwise comparisons to estimate the difference between the fitted trends for each group in each of the genes analyzed. For VEGF, there were significant differences between the CG-MTD and MET-MTD groups. The MTD group showed a significant reduction in _Vegf_ expression of $\approx$ 60% at week 1, but the magnitude of the reduction diminished as the study progressed and became non-significant at week 4 (Figure \@ref(fig:GAMs-qPCR-pwcomp-plot)A, B). 
+
+For _Hif-1a_, significant differences exist between the CG-MTD groups from week 1 until the middle of week 2, and between the MET-MTD groups starting at week 1 until week 5 (Figure \@ref(fig:GAMs-qPCR-pwcomp-plot)C, D). In both the CG and MET groups, the expression of _Hif-1a_ was higher than in the MTD group by $\approx$ 50% at week 1, and the magnitude of the difference decreased as treatment progressed.
+
+In the case of _Aldoa_, the overall difference in the trends followed the same pattern as those from _Hif-1a_, but the differences were significant between the CG and MET groups between weeks 3 and 4 (Figure \@ref(fig:GAMs-qPCR-pwcomp-plot)E). In the case of the MET and MTD groups, significant differences existed between weeks 3 and 5 (Figure \@ref(fig:GAMs-qPCR-pwcomp-plot)F). There were significant differences in the expression of _Raptor_ between the CG and MTD (week 5), and MET-MTD (weeks 1-6) groups. 
+
+The pairwise comparison of the smooth trends for the relative expression of PGK1 showed the same trends from _Hif-1a_ and _Aldoa_, but in this case significant differences existed between all groups. The expression of this gene was significantly lower in the MET group compared to the CG group between weeks 3-4  (Figure \@ref(fig:GAMs-qPCR-pwcomp-plot)I). The CG group had higher expression than the MTD group between weeks 4 and 6 (Figure \@ref(fig:GAMs-qPCR-pwcomp-plot)J). Finally, the expression in the MET group was significantly higher than in the MTD group between weeks 2 and 6 \@ref(fig:GAMs-qPCR-pwcomp-plot)K).
+
+```{r,GAMs-qPCR-pwcomp-plot,fig.align='center', fig.width=10, fig.height=10,echo=FALSE, warning=FALSE,fig.cap='(ref:fig-qPCR-pwcomp-caption)'}
+p1+p2+p3+p4+p5+p6+p7+p8+p9+p10+p11+plot_annotation(tag_levels = 'A')+plot_layout(design = layout)&
+    theme(plot.tag = element_text(size=18,face='bold'),
+          axis.title = element_text(size=14),
+          axis.text = element_text(size=14),
+          strip.text=element_text(size=14))
+```
+
+(ref:fig-qPCR-pwcomp-caption) Pairwise comparisons between the fitted smooth trends for each group from Figure \@ref(fig:GAMs-qPCR-plot). Solid lines represent the estimated difference between the smooth trends, yellow shaded regions represent a 95% simultaneous confidence interval around the difference. Purple areas indicate time intervals where a significant difference exists (where the interval does not cover zero, which is marked by the red dotted line). In each panel, the first group of the pair is the one used as the reference to which the comparison of the other group is made. **A**, **B**: Significant differences exist in _Vegf_ expression between the CG-MTD  and MET-MTD groups between weeks 1-4.**C**, **D**: Significant differences exist in _Hif-1a_ expression between the CG-MTD groups (weeks 1-2) and MET-MTD (weeks 1-5). **E**, **F**: Smooth trend comparisons for _Aldoa_ expression show significant differences between the CG-MET (between weeks 3-4) and MET-MTD (weeks 3-5) groups. **G**, **H**: Significant differences in the longitudinal trends in expression for _Raptor_ exist between the CG-MTD (week 5) and MET-MTD (weeks 1-6) pairs. **I**, **J**,**K**: The expression of _Pgk1_ shows significant differences between the different groups. For the CG-MET pair  the difference is from middle of week 3 through middle of week 4. In the CG-MTD pair, the difference is between weeks 5-6. In the MET-MTD pair, the difference is from week 2 until week 6. 
+
+
+## Effect of NAC in MVD in tumors
+
+To determine the overall effect of both MET and MTD NAC in the development of vasculature in CRC, tumors were subjected to immunohistochemistry for Nestin in order to quantify the area of blood vessels relative to total tissue area, which represented the MVD of tumors. Specifically, MTD-treated tumors showed reduced vascular area (median 7.73% vs 25.1% and 23.63% in the CG and MET groups, respectively). There was a significant difference between the CG-MTD and MET-MTD groups in MVD (_p_=$9.0\times 10^{-7}$ and _p_=$3.9\times 10^{-7}$)(Figure \@ref(fig:IHC-MVD-plot)D). 
+
+```{r,IHC-MVD,echo=FALSE,include=FALSE }
+
+source(here("code",
+                  "scripts",
+                  "Imaging_data_analysis.R"))
+```
+
+
+```{r,IHC-MVD-plot,fig.align='center', fig.width=3.75, fig.height=3.75,echo=FALSE, warning=FALSE, fig.cap='(ref:fig-4-caption)'}
+image_a&
+    theme(plot.tag = element_text(size=12,face='bold'),
+          axis.title = element_text(size=8),
+          axis.text = element_text(size=8))
+```
+
+(ref:fig-4-caption) Immunohistochemical expression of Nestin in primary colorectal tumors treated with different NAC strategies. Nestin-positive regions (brown), Nestin-negative tissue (blue). **A**: Control (CG). **B** Metronomic (MET). **C**: Maximum-tolerated dose (MTD). **D**: Violin plot showing the density and spread of MVD in the different treatment groups. Significant differences exist for the total area of Nestin present between the CG-MTD (_p_=$9.0\times 10^{-7}$) and MET-MTD-treated tumors (_p_=$3.9\times 10^{-7}$) (Kruskal Wallis test).  All images were obtained using a 10x objective, scale bar 200 $\mu$m.

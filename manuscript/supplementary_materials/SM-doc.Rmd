@@ -1,0 +1,349 @@
+---
+title: | 
+    | **Longitudinal examination of perfusion and angiogenesis markers in primary colorectal tumors shows distinct signatures for metronomic and maximum-tolerated dose strategies**
+    | 
+    | SUPPLEMENTARY MATERIALS: APPENDIX
+header-includes:
+    \usepackage{placeins}
+output:  
+  bookdown::pdf_document2:
+    #template: my-template.tex #if a custom template that removes the additional "and" in the author information is desired
+    pandoc_args: --listings #calls the listings package to fit code within the page margins
+    keep_tex: yes #keep LaTeX file for submission
+    fig_caption: yes #allows captions in figures
+    toc: false #do not include table of contents
+    extra_dependencies:
+      subfig: null #allows for subfigures
+      breqn: null #line breaks for long equations
+      caption: ["font={small}"] #size of the figure captions
+    includes:
+      in_header: latex_docs/preamble_SM.sty #additional LaTeX formatting
+  bookdown::word_document2:
+    fig_caption: yes #figure caption
+    keep_md: yes
+  bookdown::html_document2:
+    css: "style.css" #style for the HTML document
+#csl: bibliography/elsevier-with-titles.csl #style for references
+#bibliography: bibliography/refs.bib #references
+link-citations: yes #adds links to the citations
+'': default
+---
+
+```{r libraries, message = FALSE,include=FALSE}
+#the packages needed to run the code
+
+library(patchwork)
+library(tidyverse)
+library(mvnfast)
+library(nlme)
+library(mgcv)
+library(gratia)
+library(here)
+library(scico)
+library(viridis)
+library(kableExtra)
+set.seed(2021) #set seed for reproducibility
+
+#knitr::opts_chunk$set(fig.pos = 'H', out.extra = "",error=TRUE)
+
+#global themes for plotting
+thm1<-scale_fill_scico_d(palette="tokyo",begin=0.3, end=0.8, direction = -1, aesthetics = c("colour","fill"))
+rib_col<-'#EFEE65' #color for interval in GAMS
+rect_col<-'#B53797' #color for significant intervals GAMs
+
+#this function will remove the default "author information" that is the Pandoc LaTeX template. Otherwise, and additional "and" will appear at the end of the author list.Or, the custom template that is in the YAML header and that has the "author" line deleted may be used as well. An explanation in detail is provided at:
+#https://github.com/rstudio/bookdown/issues/1158
+remove_author <- function(x) {
+  # identify empty author line
+  i <- grep("^\\\\author\\{\\}$", x)
+  # be sure it is the one pandoc inserts
+  if(length(i) != 0 && grepl('^\\\\date\\{', x[i+1])) x <- x[-i]
+  x
+}
+options(bookdown.post.latex = remove_author)
+```
+
+<!-- Allows for figure numbers with letters for Appendix -->
+\counterwithin{figure}{section}
+
+<!-- Allows for table numbers with letters for Appendix -->
+\counterwithin{table}{section}
+
+\newpage
+
+# MATERIALS AND METHODS
+
+## Primers
+
+Primer sequences were designed in-house, BLASTed for specificity and obtained from Integrated DNA Technologies (Coralville, Iowa, US). Due to the relatively low amount of cDNA obtained from each tumor sample we used CT-26 cell derived cDNA for efficiency and annealing temperature determination via the standard curve method using 6 serial dilutions (5x each).  All experiments were performed on a CFX96 Real Time PCR system (Bio-Rad). 
+
+Primer information regarding sequences, annealing temperatures, and efficiencies can be found in Table \@ref(tab:primers).
+
+```{r,primers,echo=FALSE,warning=FALSE}
+primers<-tibble(GENES=c("GAPDH",
+                        "VEGF",
+                        "HIF-1a",
+                        "DEK",
+                        "PGK1",
+                        "RPTOR",
+                        "ALDOA",
+                        "STAT3"),
+                SEQUENCES=c("CCTCGTCCCGTAGACAAAATG/\nTGAAGGGGTCGTTGATGGC",
+                            "TAACGATGAAGCCCTGGAGT/\nTATGTGCTGGCTTTGGTGAG",
+                            "CCTGATGCTCTCACTCTGCT/\nTTCAAGTTGTTGATCTTCAGTTTC",
+                            "GCAGACAGCAGTACCACCAA/\nTCATCTGTAGGTGGCTTTTTCA",
+                            "AGAGTCCAGAGCGACCCTTC/\nTTATTGATCAGCTGGATCTTGTC",
+                            "TGGTGAAGACCACACCCTGT/\nGTAGGTTTGCACCGATGGTT",
+                            "ACGGTCACAGCACTTCGTC/\nTTGATGGATGCCTCTTCCTC",
+                            "GAGGGGTCACTTTCACTTGG/\nTCAGCTGCTGCTTGGTGTAT"),
+                PRODUCT_LENGTH=c(124,
+                                 91,
+                                 99,
+                                 116,
+                                 73,
+                                 96,
+                                 92,
+                                 87),
+                ANNEALING_TEMP=c(60,
+                                 60,
+                                 60,
+                                 60,
+                                 55.7,
+                                 60,
+                                 64.5,
+                                 58),
+                EFFICIENCY=c(96.25,
+                             97.85,
+                             101.72,
+                             98.61,
+                             91.99,
+                             99.42,
+                             97.43,
+                             93.90))
+
+primers %>%
+    mutate_all(linebreak)%>%
+    kable(booktabs=TRUE,
+          longtable=TRUE,
+        escape=FALSE,
+        align="c",
+        format="latex",
+        col.names=linebreak(c('GENE','SEQUENCE\n(F/R)','PRODUCT\nLENGTH\n(bp)','ANNEALING TEMP.\n$^{\\circ}$C','AMPLIFICATION\nEFFICIENCY\n($\\%$)')),caption='Primer information') %>%
+    row_spec(0,bold=T,color="black") %>% #to make header in bold
+    kable_styling(font_size = 8) 
+    
+```
+
+
+## Statistical Analyses
+
+### Generalized Additive Models (GAMs)
+
+For both the DRS and qPCR data a GAM to analyze the trend of the variable of interest (either DRS-derived pefusion parameters or relative gene expression) was fitted, using the package `{mgcv}`. The overall construction of the model was:
+
+ `model<-gam(Variable ~ Group +s(Day, by = Group, k=6, method = 'REML', data = data)`
+
+Where `model` specifies the object that stores the fitted model, `Variable` represents the variable of interest (qPCR fold changes or DRS-derived optical parameters), `Group` is a parametric term that allows to provide an intercept to each of the three treatment groups, and the content of the smoother (starting with `s(`) specifies the use of 6 basis functions (`k=6`) where the smoothness parameter is estimated via restricted maximum likelihood (`method=REML`). Finally, `data` refers to the dataframe containing the data of interest.
+
+#### DRS
+
+The next chunk shows all the models fitted for the DRS data.
+
+```{r,fit-GAMs,eval=FALSE}
+
+StO2_gam <- gam(StO2_fold ~ GROUP+s(WEEK, by = GROUP, k = 6),
+                family=scat(link='identity', min.df = 3),
+                method='REML',
+                data  = data1)
+
+HbO2_gam <- gam(HbO2_fold ~ GROUP+s(WEEK, by = GROUP, k = 6),
+                family=scat(link='identity', min.df = 3),
+                method='REML',
+                data  = data1)
+
+tHb_gam <- gam(tHb_fold ~ GROUP+s(WEEK, by = GROUP, k = 6),
+               family=scat(link='identity', min.df = 3),
+               method='REML',
+               data  = data1)
+
+HbO_gam <- gam(HbO_fold ~ GROUP+s(WEEK, by = GROUP, k = 6),
+               family=scat(link='identity', min.df = 3),
+               method='REML',
+               data  = data1)
+
+```
+
+The code to obtain Figure 3 on the main  manuscript (where the individual values are shown along with the models) can be found in the script `DRS_GAMs.R`
+
+```{r,GAM-plot-function-app,eval=FALSE, include=FALSE}
+
+GAM_plot2<-function(model,data){
+
+ci <- confint(model, parm = "s(DAY)", partial_match = TRUE, type = "confidence")
+
+## simultaneous interval
+si <- confint(model, parm = "s(DAY)", type = "simultaneous", partial_match = TRUE)
+
+# mean shift for Treatment group
+Intercept <- coef(model)[1]
+constMET <- coef(model)[2]+Intercept
+constMTD <- coef(model)[3]+Intercept
+
+#extract the response from the model
+test<-model$formula[[2]]
+
+#convert to character
+test<-as.character(test)
+test<-as.list(test)
+#we are doing fold changes, so split the string where the diagonal is. We will end up
+#with a list of lenght three, only the last two contain the terms of interest
+
+
+#select columns that match the pattern
+data<-data %>% 
+  select(DAY,GROUP,"Y"=test[[1]]) 
+
+
+#pointwise confidence interval
+ci <- ci %>%
+mutate(est = case_when(GROUP == "MET" ~ est + constMET,
+                       GROUP == "MTD" ~ est + constMTD,
+                                          TRUE ~ est+Intercept),
+lower = case_when(GROUP == "MET" ~ lower + constMET,
+                  GROUP == "MTD" ~ lower + constMTD,
+                                          TRUE ~ lower+Intercept),
+upper = case_when(GROUP == "MET" ~ upper + constMET,
+                  GROUP == "MTD" ~ upper + constMTD,
+                                          TRUE ~ upper+Intercept))
+
+#simultaneous confidence interval
+si <- si %>%
+mutate(est = case_when(GROUP == "MET" ~ est + constMET,
+                       GROUP == "MTD" ~ est + constMTD,
+                                          TRUE ~ est+Intercept),
+lower = case_when(GROUP == "MET" ~ lower + constMET,
+                  GROUP == "MTD" ~ lower + constMTD,
+                                          TRUE ~ lower+Intercept),
+upper = case_when(GROUP == "MET" ~ upper + constMET,
+                  GROUP == "MTD" ~ upper + constMTD,
+                                          TRUE ~ upper+Intercept))
+
+
+GAM_plot<-ggplot(ci, aes(x = DAY, y = est, group = smooth)) +
+geom_line(lwd = 1) +
+geom_ribbon(data = ci, mapping = aes(ymin = lower, ymax = upper, x = DAY, group = smooth,fill = GROUP),
+inherit.aes = FALSE, alpha = 0.7,
+show.legend=FALSE) +
+geom_ribbon(data = si,
+mapping = aes(ymin = lower, ymax = upper, x = DAY, group = smooth,fill =GROUP),
+inherit.aes = FALSE, alpha = 0.3,
+show.legend=FALSE)+
+    geom_point(data=data, aes(x = DAY, 
+                        y = Y, 
+                        color = GROUP), 
+                        size=1.5,
+                        alpha=0.6, 
+               inherit.aes = FALSE,
+               show.legend = FALSE)+
+    geom_line(data=si,aes(DAY,upper,color=GROUP), size=0.8, alpha=0.7)+
+    geom_line(data=si,aes(DAY,lower,color=GROUP), size=0.8, alpha=0.7)+
+    labs(y=expression(atop(StO[2],'(complete observations)')))+
+    scale_x_continuous(breaks=c(1,2,3,4,5,6))+
+      theme_classic()+
+  theme(
+    axis.text=element_text(size=22))+
+      facet_wrap(~GROUP)+
+      thm1
+
+}
+
+a<-GAM_plot2(StO2_gam,data1)+labs(y=expression(atop(StO[2])),x="Week")
+b<-GAM_plot2(HbO2_gam,data1)+labs(y=expression(atop(HbO[2])),x="Week")
+c<-GAM_plot2(tHb_gam,data1)+labs(y="tHb",x="Week")
+d<-GAM_plot2(HbO_gam,data1)+labs(y="HbO",x="Week")
+
+a+b+c+d+plot_annotation(tag_levels = "A")
+```
+
+Figure \@ref(fig:fig-DRS-GAMs-pwc) is an expanded version of the pairwise comparisons from Figure 2, showing all the pairwise comparisons between the different DRS-derived measures of perfusion.
+
+```{r,DRS-GAMs-pwc, include=FALSE}
+source(here("code",
+                  "scripts",
+                  "DRS_GAMs.R"))
+```
+
+
+```{r,fig-DRS-GAMs-pwc,fig.align='center',fig.height=12, fig.width=10,fig.cap='(ref:fig-DRS-GAMs-pwc-caption)', echo=FALSE}
+a2+b2+c2+d2+plot_annotation(tag_levels = 'A')
+
+```
+
+(ref:fig-DRS-GAMs-pwc-caption) Smooth difference pairwise comparisons for all DRS-derived data.
+
+#### qPCR
+
+Here, we present the GAMs used to fit the trends in mRNA expression, and which can be found in the script `qPCR_GAMs.R`, which also contains all the previous steps for data cleaning, normalization, and relative expression calculation.
+
+```{r,qPCR-GAMs-models, eval=FALSE}
+k=6
+VEGF_gam<-gam(Norm_ratio~GROUP+s(WEEK,by=GROUP,k=k),
+              method='REML',
+              data=VEGF)
+
+HIF1_gam<-gam(Norm_ratio~GROUP+s(WEEK,by=GROUP,k=k),
+              method='REML',
+              data=HIF_1)
+
+DEK_gam<-gam(Norm_ratio~GROUP+s(WEEK,by=GROUP,k=k),
+             method='REML',
+             data=DEK)
+
+ALDOA_gam<-gam(Norm_ratio~GROUP+s(WEEK,by=GROUP,k=k),
+               method='REML',
+               data=ALDOA)
+
+PGK1_gam<-gam(Norm_ratio~GROUP+s(WEEK,by=GROUP,k=k),
+              method='REML',
+              data=PGK1)
+
+RPTOR_gam<-gam(Norm_ratio~GROUP+s(WEEK,by=GROUP,k=k),
+               method='REML',
+               data=RPTOR)
+
+STAT3_gam<-gam(Norm_ratio~GROUP+s(WEEK,by=GROUP,k=k),
+               method='REML',
+               data=STAT3)
+```
+
+
+```{r,qPCR-GAMs-pwc, include=FALSE}
+
+source(here("code",
+                  "scripts",
+                  "qPCR_GAMs.R"))
+
+source(here("code",
+                  "scripts",
+                  "qPCR_GAMs_pwcomps.R"))
+```
+
+Next, Figure \@ref(fig:fig-qPCR-GAMs-pwc) is an expanded version of Figure 4 from the main manuscript. It presents all the pairwise comparisons between the fitted smooths for all genes. Only the pairwise comparisons with significant differences (interval not covering zero), are included in Figure 4.
+
+
+```{r,fig-qPCR-GAMs-pwc,fig.align='center',fig.height=14, fig.width=10,fig.cap='(ref:fig-qPCR-GAMs-pwc-caption)', echo=FALSE}
+a1+b1+c1+d1+e1+f1+g1+plot_annotation(tag_levels = 'A')
+```
+
+(ref:fig-qPCR-GAMs-pwc-caption) Smooth difference pairwise comparisons for mRNA expression across all genes.
+
+\FloatBarrier
+## Image Analysis and MVD Quantification
+
+Tumor sections were imaged in an upright Nikon widefield microscope using a 10x objective (0.30 NA) and the same binning, exposure time and gain settings. Between 1-3 non-overlapping regions of interest (ROI) were obtained per sample, and in each ROI areas for segmentation were labeled as Nestin-positive, background, or tissue. The segmentation of each ROI was performed using the Trainable WEKA Segmentation from Fiji. Between 1 to 4 regions of each label per ROI were manually selected and used to train the algorithm, followed by testing on the whole image. Figure (ref:fig-MVD-Appendix)A shows the image analysis workflow. Figure (ref:fig-MVD-Appendix)B shows a representative tumor image, where the Nestin-1 positive staining is visible (brown areas). Once the ROIs were labeled accordingly, the WEKA algorithm was used to obtain segmented regions (Figure (ref:fig-MVD-Appendix)C). Pixels identified as background (red regions in Figure (ref:fig-MVD-Appendix)C) were not considered for MVD quantification.
+
+```{r, fig-MVD-Appendix, echo=FALSE, fig.cap="(ref:fig-MVD-Appendix-caption)", fig.align='center',out.width = '60%'}
+knitr::include_graphics(here("figures/MVD_quant_Appendix.png"))
+```
+
+(ref:fig-MVD-Appendix-caption) MVD quantification workflow. **A**: Workflow for MVD quantification. **B**:  Representative tumor image showing Nestin-1 positive staining (brown), negative Nestin-1 tissue staining (blue) and image background (white). **C**: Mask generated from **B** using the WEKA Algorithm. Nestin-1 positive areas (blue), tissue (green), background (red).

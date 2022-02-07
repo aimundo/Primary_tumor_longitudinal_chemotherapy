@@ -1,0 +1,121 @@
+---
+title: '**Longitudinal examination of perfusion and angiogenesis markers in primary colorectal tumors shows distinct signatures for metronomic and maximum-tolerated dose strategies**'
+header-includes:
+    \usepackage{placeins}
+#geometry: margin=1cm
+output:  
+  bookdown::pdf_document2:
+    #template: my-template.tex #if a custom template that removes the additional "and" in the author information is desired
+    fontsize: 12pt
+    fontfamily: helvetica
+    pandoc_args: --listings #calls the listings package to fit code within the page margins
+    keep_tex: yes #keep LaTeX file for submission
+    fig_caption: yes #allows captions in figures
+    toc: false #do not include table of contents
+    extra_dependencies:
+      subfig: null #allows for subfigures
+      breqn: null #line breaks for long equations
+      caption: ["font={small}"] #size of the figure captions
+      float: null #allows for control of placement of figures
+    includes:
+      in_header: latex_docs/preamble.sty #additional LaTeX formatting
+  bookdown::word_document2:
+    fig_caption: yes #figure caption
+    reference_docx: "docx_template.docx"
+    keep_md: yes
+  bookdown::html_document2:
+    css: "html_docs/style.css" #style for the HTML document
+csl: bibliography/american-medical-association.csl #style for references
+bibliography: bibliography/refs.bib #references
+link-citations: yes #adds links to the citations
+urlcolor: blue
+'': default
+# knit: |
+#     rmarkdown::render(
+#       output_file= here::here("Manuscripts/Manuscript_by_chapters-SIM_Revisions/output", outputFile)
+---
+
+
+# Abstract
+
+Metronomic chemotherapy (MET) has been developed to address the shortcomings of maximum-tolerated chemotherapy (MTD) in regard to toxicity and development of resistance mechanisms in the tumor. In colorectal cancer (CRC), MET is a promising novel strategy to treat locally advanced malignancies when used as neoadjuvant chemotherapy (NAC). However, so far there are no preclinical studies to assess the impact of MET NAC in CRC to assess the benefits and challenges of this approach. Here, we used a primary model of CRC (via azoxymethane) to analyze longitudinal changes in angiogenesis in primary tumors under MET and MTD NAC using a combination of diffuse reflectance spectroscopy and mRNA expression (via qPCR). Our results show that MET and MTD NAC lead to increased mean tissue oxygen saturation (8% and 5%, respectively) and oxyhemoglobin (15% and 10%) between weeks 2 and 5 of NAC, and that such increases are caused by distinct molecular signatures in the angiogenic program. Specifically, we find that in the MET group there is a sustained increase in _Hif-1a_, _Aldoa_, and _Pgk1_ expression, suggesting upregulated glycolysis, whereas MTD NAC causes a significant reduction in the expression of the aforementioned genes and of _Vegf_, leading to vascular remodeling in MTD-treated tumors. Taken together, this study demonstrates the ability of combined optical and molecular methodologies to provide a holistic picture of tumor response to therapy in CRC in a minimally invasive manner.
+
+# Keywords {-}
+
+longitudinal data; colon cancer; azoxymethane; hypoxia; vegf; generalized additive models
+
+```{r libraries, message = FALSE,include=FALSE}
+#the packages needed to run the code
+
+library(patchwork)
+library(tidyverse)
+library(mvnfast)
+library(nlme)
+library(here)
+library(mgcv)
+library(grid)
+library(png)
+library(tiff)
+library(ggsignif)
+library(showtext)
+library(gratia)
+library(viridis)
+library(scico)
+set.seed(2021) #set seed for reproducibility
+
+thm1<-scale_fill_scico_d(palette="tokyo",begin=0.3, end=0.8, direction = -1, aesthetics = c("colour","fill"))
+
+font_add("Atkinson",regular="AtkinsonHyperlegible-Regular.ttf",italic="AtkinsonHyperlegible-Italic.ttf")
+showtext_auto()
+
+rib_col<-'#EFEE65' #color for interval in GAMS
+rect_col<-'#B53797' #color for significant intervals GAMs
+
+#this function will remove the default "author information" that is the Pandoc LaTeX template. Otherwise, and additional "and" will appear at the end of the author list.Or, the custom template that is in the YAML header and that has the "author" line deleted may be used as well. An explanation in detail is provided at:
+#https://github.com/rstudio/bookdown/issues/1158
+remove_author <- function(x) {
+  # identify empty author line
+  i <- grep("^\\\\author\\{\\}$", x)
+  # be sure it is the one pandoc inserts
+  if(length(i) != 0 && grepl('^\\\\date\\{', x[i+1])) x <- x[-i]
+  x
+}
+options(bookdown.post.latex = remove_author)
+```
+
+
+```{r child='sections/01-Introduction.Rmd'}
+```
+
+\FloatBarrier 
+
+```{r child='sections/02-Materials-and-Methods.Rmd'}
+```
+
+\FloatBarrier
+
+```{r child='sections/03-Results.Rmd'}
+```
+
+<!-- \FloatBarrier -->
+
+```{r child='sections/04-Discussion.Rmd'}
+```
+
+<!-- \FloatBarrier -->
+
+<!-- ```{r child='sections/05-Conclusions.Rmd'} -->
+<!-- ``` -->
+
+\FloatBarrier
+
+# Supplementary Materials {-}
+
+An Appendix which contains qPCR methods, the GAMs used to fit longitudinal data and expanded figures for pairwise comparisons are available in PDF format. A repository that contains all the DRS and qPCR data, as well as the code used to create this manuscript can be found in https://github.com/aimundo/Primary_tumor_longitudinal_chemotherapy. The dataset of immunohistochemistry images is stored in [Biostudies](https://www.ebi.ac.uk/biostudies/) under accession number S-BIAD323.
+
+***
+# References
+
+<div id="refs"></div>
+
+
