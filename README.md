@@ -20,7 +20,7 @@ The best way to use this work is to fork the repo. From there the following appr
 
 - The manuscript can be compiled.
 - Individual scripts can be run, but they require the libraries found in the setup chunk in `Complete_manuscript.Rmd` to work.
-- Imaging data can be found in [BioStudies](https://www.ebi.ac.uk/biostudies/studies/S-BIAD323) under accession number S_BIAD323.
+- Imaging data can be found in [BioStudies](https://www.ebi.ac.uk/biostudies/studies/S-BIAD323) under accession number S-BIAD323.
 
 # License
 
