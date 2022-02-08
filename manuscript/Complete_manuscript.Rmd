@@ -111,7 +111,7 @@ options(bookdown.post.latex = remove_author)
 
 # Supplementary Materials {-}
 
-An Appendix which contains qPCR methods, the GAMs used to fit longitudinal data and expanded figures for pairwise comparisons are available in PDF format. A repository that contains all the DRS and qPCR data, as well as the code used to create this manuscript can be found in https://github.com/aimundo/Primary_tumor_longitudinal_chemotherapy. The dataset of immunohistochemistry images is stored in [Biostudies](https://www.ebi.ac.uk/biostudies/) under accession number S-BIAD323.
+An Appendix which contains qPCR methods, the GAMs used to fit longitudinal data and expanded figures for pairwise comparisons are available in PDF format. A repository that contains all the DRS and qPCR data, as well as the code used to create this manuscript can be found in https://github.com/aimundo/Primary_tumor_longitudinal_chemotherapy. The dataset of immunohistochemistry images is stored in the[Biostudies](https://www.ebi.ac.uk/biostudies/) database under accession number S-BIAD323.
 
 ***
 # References
