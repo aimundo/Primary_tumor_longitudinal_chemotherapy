@@ -6,6 +6,10 @@ Longitudinal examination of perfusion and angiogenesis markers in primary colore
 
 This repository contains code, raw data, scripts and manuscript files for a study of tumor response to treatment (metronomic and maximum-tolerated dose chemotherapy) in a primary murine model of colorectal cancer.
 
+**Update**: A preprint for this work is avaiable in _bioRxiv_ ([link](https://www.biorxiv.org/content/10.1101/2022.02.07.479423v1))
+
+Immunohistochemistry imaging data is avaiable in the BioStudies database under accession number S-BIAD323 ([link](https://www.ebi.ac.uk/biostudies/studies/S-BIAD323))
+
 Repository structure:
 
 - code: Contains scripts that create figures, run statistical analyses (in R)
